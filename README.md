@@ -26,8 +26,3 @@ Backend: Create APIs for product management, user authentication, and order mana
 Admin Panel: Allow admins to upload, edit, delete products and manage users/orders.
 Payment Integration: Add Stripe and Razorpay for online payments.
 
-Deployment:
-Build the React app and Node.js server for production.
-Deploy the frontend on Vercel and backend on services like Heroku or DigitalOcean.
-Project Link:
-Explore the deployed project: https://foreverbuy.in/
