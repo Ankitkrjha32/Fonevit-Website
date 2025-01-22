@@ -18,7 +18,7 @@ connectCloudinary();
 //middleware
 app.use(express.json());
 app.use(cors({
-    origin: '*', // Your frontend's origin
+    origin: 'http://localhost:3000',
     credentials: true,
 }));
 

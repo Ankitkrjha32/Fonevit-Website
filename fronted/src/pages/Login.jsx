@@ -30,12 +30,12 @@ const Login = () => {
       } else {
         // Login logic
         const response = await axios.post(`${backendUrl}/api/user/login`, {
-          // const response = await axios.post('http://localhost:4000/api/user/login', {
           email,
           password,
         });
         if (response.data.success) {
-          toast.success(response.data.message);
+          // toast.success("Sucessfully Login");
+          // toast.success(setUserName);
           
           localStorage.setItem("token", response.data.token);
           setToken(response.data.token);
@@ -48,6 +48,21 @@ const Login = () => {
       toast.error(error.response?.data?.message || "Something went wrong!");
     }
   };
+
+
+  // This useEffect for auto filled demo id and password for testing purpose line 52-62
+  useEffect(() => {
+    if (currentState === "Login") {
+      toast.success("testing id and password");
+      setEmail("test@example.com");
+      setPassword("Password@56");
+    } else {
+      setEmail("");
+      setPassword("");
+    }
+  }, [currentState]);
+
+  // till this line 
 
   useEffect(() => {
     if (token) {
@@ -77,6 +92,7 @@ const Login = () => {
         onChange={(e) => setEmail(e.target.value)}
         className="w-full px-3 py-2 border border-gray-800"
         type="text"
+        value={email}
         placeholder="Email"
         required
       />
@@ -84,6 +100,7 @@ const Login = () => {
         onChange={(e) => setPassword(e.target.value)}
         className="w-full px-3 py-2 border border-gray-800"
         type="password"
+        value={password}
         placeholder="Password"
         required
       />

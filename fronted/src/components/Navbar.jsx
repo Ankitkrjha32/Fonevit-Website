@@ -1,16 +1,59 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState,useEffect } from 'react';
 import { Link, NavLink } from 'react-router-dom';
 import { assets } from '../assets/frontend assets/assets'; 
 import { ShopContext } from '../context/ShopContext';
+import {jwtDecode} from 'jwt-decode';
+import axios from 'axios';
+import { toast } from 'react-toastify';
+const backendUrl = import.meta.env.VITE_BACKEND_URL||'http://localhost:4000';
 
 const Navbar = () => {
   const [visible, setVisible] = useState(false);
+  const [userName, setUserName] = useState('');
   const { setShowSearch, getCartCount, navigate, token, setToken, setCartItem } = useContext(ShopContext);
+ 
+
+  useEffect(() => {
+    if (token) {
+      try {
+        
+        // Decode the JWT to get the user ID
+        const decodedToken = jwtDecode(token);
+        const userId = decodedToken.id;
+        
+
+        // Fetch user name from the backend using the user ID
+        axios
+          .get(`${backendUrl}/api/user/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
+          .then((response) => {
+            
+            if (response.data.success && response.data.name) {
+              setUserName(response.data.name); 
+              toast.success(`Welcome! ${ response.data.name}`);
+             
+            } else {
+              console.log('User not found');
+            }
+
+            
+          })
+          .catch((error) => {
+            console.error('Error fetching user data:', error);
+      
+          });
+      } catch (error) {
+        console.error('Invalid token:', error);
+       
+      }
+    }
+  }, [token]);
 
   const logout = () => {
     navigate('/login');
+    toast.success("Logout");
     localStorage.removeItem('token');
     setToken('');
+    setUserName('');
     setCartItem({});
   };
 
@@ -58,6 +101,7 @@ const Navbar = () => {
 
       {/* Right Section */}
       <div className="flex items-center gap-6">
+        
         <img
           onClick={() => setShowSearch(true)}
           src={assets.search_icon}
@@ -72,6 +116,7 @@ const Navbar = () => {
               className="w-5 cursor-pointer"
             />
           </Link>
+          
           {token && (
             <div className="group-hover:block hidden absolute dropdown-menu right-0 pt-4">
               <div className="flex flex-col gap-2 w-36 py-3 px-5 bg-slate-100 text-gray-500 rounded">
@@ -92,6 +137,13 @@ const Navbar = () => {
             </div>
           )}
         </div>
+         {/* Display user's name */}
+         {token && (
+          <div className="lg:text-[15px] font-serif  text-gray-700 hidden sm:block ">
+          <span className="capitalize font-medium">{userName}</span>
+          
+          </div>
+        )}
         <Link to="/cart" className="relative">
           <img
             src={assets.cart_icon}

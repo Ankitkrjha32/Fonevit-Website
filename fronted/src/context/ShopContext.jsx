@@ -17,10 +17,12 @@ const ShopContextProvider = (props) => {
   const [showSearch, setShowSearch] = useState(false);
   const [cartItems, setCartItems] = useState({});
   const [products, setProducts] = useState([]);
+  
+
   const navigate = useNavigate();
+
   const backendUrl = import.meta.env.VITE_BACKEND_URL||'http://localhost:4000';
-  // console.log('Backend URL:', backendUrl);
-  // console.log('products' , p1);
+  
 
   const [token, setToken] = useState('');
   
@@ -42,7 +44,7 @@ const ShopContextProvider = (props) => {
     }
     setCartItems(cartData);
     toast.success('Added into Cart');
-    // console.log(cartData);
+    
     navigate('/cart');
 
 
@@ -133,7 +135,7 @@ const ShopContextProvider = (props) => {
       }
     }
 
-    console.log(products);
+    // console.log(products);
     
     useEffect(() => {
       fetchProducts();
@@ -166,6 +168,7 @@ const ShopContextProvider = (props) => {
     products,
     token,
     setToken,
+    
   };
 
   useEffect(() => {
