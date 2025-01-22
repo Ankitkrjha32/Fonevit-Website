@@ -34,7 +34,7 @@ const Login = () => {
           password,
         });
         if (response.data.success) {
-          toast.success("Sucessfully Login");
+          // toast.success("Sucessfully Login");
           // toast.success(setUserName);
           
           localStorage.setItem("token", response.data.token);
