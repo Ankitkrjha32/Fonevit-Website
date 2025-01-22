@@ -19,10 +19,10 @@ const About = () => {
         />
         <div className="flex flex-col justify-center gap-6 md:w-2/4 text-gray-600">
           <p className="leading-relaxed text-base">
-            Forever was born out of a passion for innovation and a desire to
+            Fonevit was born out of a passion for innovation and a desire to
             revolutionize the way people engage with quality products. Founded 
             on the principles of integrity, creativity, and customer-centric 
-            values, Forever started as a small initiative aimed at bridging the 
+            values, Fonevit started as a small initiative aimed at bridging the 
             gap between affordability and premium quality. Over the years, 
             it has grown into a symbol of trust and excellence.
           </p>
@@ -36,7 +36,7 @@ const About = () => {
             Our mission is to create a lasting impact by offering products that 
             enhance everyday lives. We aim to inspire and empower our customers 
             with innovative solutions that are not only functional but also 
-            environmentally responsible. At Forever, we strive to be a brand 
+            environmentally responsible. At Fonevit, we strive to be a brand 
             that people can rely on, fostering a sense of belonging and trust 
             through every interaction.
           </p>

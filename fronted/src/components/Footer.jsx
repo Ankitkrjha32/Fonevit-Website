@@ -10,7 +10,7 @@ const Footer = () => {
             <div>
                 <img src={assets.logo} alt="" className='w-32 mb-5' />
                 <p className='w-full sm:w-2/3 text-gray-600'>
-  Forever Clothing is your one-stop destination for the latest trends in fashion. Explore our exclusive collections and enjoy seamless shopping with quality products, amazing deals, and exceptional service. Your style, your way—always with Forever Clothing.
+  Fonevit Clothing is your one-stop destination for the latest trends in fashion. Explore our exclusive collections and enjoy seamless shopping with quality products, amazing deals, and exceptional service. Your style, your way—always with Fonevit Clothing.
 </p>
 
             </div>
@@ -38,7 +38,7 @@ const Footer = () => {
         </div>
         <div>
                 <hr />
-                <p className='py-5 text-sm text-center'>Copyright 2024@ forever.com - All Right Reserved</p>
+                <p className='py-5 text-sm text-center'>Copyright 2024@ Fonevit.com - All Right Reserved</p>
             </div>
     </div>
   )

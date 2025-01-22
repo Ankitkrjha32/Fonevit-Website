@@ -33,7 +33,7 @@ const Contact = () => {
           </p>
 
           {/* Careers Information */}
-          <p className="font-semibold text-xl text-gray-600">Careers at Forever</p>
+          <p className="font-semibold text-xl text-gray-600">Careers at Fonevit</p>
           <p className="text-gray-500">
             Learn more about our teams and job openings.
           </p>
