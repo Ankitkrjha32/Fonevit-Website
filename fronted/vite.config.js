@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   server: {
     host: '0.0.0.0',
-    port: process.env.PORT || 3000, // Use the Render-assigned port
+    port: process.env.PORT || 3000,  // Use the Render-assigned port
+    allowedHosts: ['fonevit-website-frontend.onrender.com'],
   }
 })
