@@ -19,13 +19,17 @@ const Navbar = () => {
         
         // Decode the JWT to get the user ID
         const decodedToken = jwtDecode(token);
+        console.log(decodedToken);    
         const userId = decodedToken.id;
+        console.log("user id is iin navbar is ",userId);
+        console.log(backendUrl);
         
 
         // Fetch user name from the backend using the user ID
         axios
           .get(`${backendUrl}/api/user/${userId}`, { headers: { Authorization: `Bearer ${token}` } })
           .then((response) => {
+            console.log("response in navbar is",response);
             
             if (response.data.success && response.data.name) {
               setUserName(response.data.name); 
@@ -38,6 +42,7 @@ const Navbar = () => {
             
           })
           .catch((error) => {
+        
             console.error('Error fetching user data:', error);
       
           });

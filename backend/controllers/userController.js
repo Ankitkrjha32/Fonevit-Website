@@ -114,10 +114,13 @@ const admin = async (req, res) => {
 };
 const getUserDetails = async (req, res) => {
     try {
-        const { id } = req.params;
+        // console.log("req body",req.body);
+        const {id} = req.params;
+        // console.log("id is",id);
 
         // Find the user in the database by their ID
         const user = await userModel.findById(id);
+        console.log("user" ,user);
 
         if (!user) {
             return res.status(404).json({ success: false, message: "User not found" });
