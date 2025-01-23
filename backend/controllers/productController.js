@@ -14,10 +14,13 @@ const addProduct = async (req, res) => {
             req.files.image4?.[0],
         ].filter((item) => item !== undefined);
 
+        
+
         // Uploading images to Cloudinary
         const imagesUrl = await Promise.all(
             images.map(async (item) => {
                 const result = await cloudinary.uploader.upload(item.path, { resource_type: 'image' });
+                console.log(result );
                 return result.secure_url;
             })
         );

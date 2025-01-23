@@ -91,6 +91,11 @@ const registerUser = async (req, res) => {
 const admin = async (req, res) => {
     try {
         const { email, password } = req.body;
+        console.log("Received Email:", email);
+        console.log("Received Password:", password);
+        console.log("Admin Email:", process.env.ADMIN_EMAIL);
+        console.log("Admin Password Hash:", process.env.ADMIN_PASSWORD_HASH);
+
 
         // Validate input
         if (!email || !password) {
@@ -99,12 +104,15 @@ const admin = async (req, res) => {
 
         if (
             email === process.env.ADMIN_EMAIL &&
-            bcrypt.compareSync(password, process.env.ADMIN_PASSWORD_HASH)
+            //skipping hashing step
+            // bcrypt.compareSync(password, process.env.ADMIN_PASSWORD_HASH)
+            password===process.env.ADMIN_PASSWORD_HASH
         ) {
             const token = jwt.sign({ email, role: "admin" }, process.env.JWT_SECRET, { expiresIn: "7d" });
+            
             return res.status(200).json({ success: true, token });
         } else {
-            console.log('ADMIN_EMAIL',ADMIN_EMAIL);
+            // console.log('ADMIN_EMAIL',process.env.ADMIN_EMAIL);
             return res.status(401).json({ success: false, message: "Invalid credentials" });
         }
     } catch (error) {
@@ -114,11 +122,11 @@ const admin = async (req, res) => {
 };
 const getUserDetails = async (req, res) => {
     try {
-        // console.log("req body",req.body);
+        
         const {id} = req.params;
-        // console.log("id is",id);
+        
 
-        // Find the user in the database by their ID
+        
         const user = await userModel.findById(id);
         console.log("user" ,user);
 
@@ -126,7 +134,7 @@ const getUserDetails = async (req, res) => {
             return res.status(404).json({ success: false, message: "User not found" });
         }
 
-        // Return the user details (e.g., name) in the response
+        
         res.status(200).json({ success: true, name: user.name });
     } catch (error) {
         console.error(error);

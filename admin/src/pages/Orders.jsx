@@ -10,6 +10,8 @@ const Orders = ({ token }) => {
   
 
   const fetchAllOrders = async () => {
+    // console.log(backendUrl);
+    
     if (!token) {
       return null;
     }

@@ -19,6 +19,8 @@ const App = () => {
     localStorage.setItem('token', token);
   }, [token]);
 
+  
+
   return (
     <div className='bg-gray-50 min-h-screen'>
       <ToastContainer />
@@ -40,6 +42,7 @@ const App = () => {
           </div>
         </>
       )}
+     
     </div>
   );
 };

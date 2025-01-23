@@ -12,6 +12,7 @@ const List = ({token}) => {
       const response = await axios.get(backendUrl + '/api/product/list',);
       
       if(response.data.success){
+        console.log("fetch list data", response);
         setList(response.data.products);
         
       
