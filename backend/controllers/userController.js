@@ -64,37 +64,85 @@ const registerUser = async (req, res) => {
 
         // Check if user exists
         const exist = await userModel.findOne({ email });
+
         if (exist) {
-            return res.status(409).json({ success: false, message: "User already exists" });
+            // Check if user is not verified and OTP has expired
+            if (!exist.isVerified || exist.verificationTokenExpiresAt < Date.now()) {
+                // Delete the expired user entry
+                await userModel.deleteOne({ email: exist.email });
+
+                // Log message to indicate entry deletion
+                console.log("User OTP expired. Old entry deleted. Creating a new one.");
+
+                // Generate new OTP and set new expiration time
+                const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+                const verificationTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000); // OTP expiry in 5 minutes
+
+                // Create new user with fresh OTP and send it
+                const salt = await bcrypt.genSalt(10);
+                const hashedPassword = await bcrypt.hash(password, salt);
+
+                const newUser = new userModel({
+                    name,
+                    email,
+                    password: hashedPassword,
+                    isVerified: false,
+                    verificationToken, // New OTP
+                    verificationTokenExpiresAt, // New expiry
+                    lastLogin: new Date(),
+                });
+
+                // Save new user and send verification email
+                await newUser.save();
+                await sendVerificationEamil(newUser.email, verificationToken);
+
+                // Return response with success and the new token
+                const token = createToken(newUser._id);
+                return res.status(200).json({
+                    success: true,
+                    message: "User registered successfully. A new OTP has been sent.",
+                    newUser,
+                    token,
+                });
+            } else {
+                // If OTP has not expired or user is already verified
+                return res.status(409).json({ success: false, message: "User already exists" });
+            }
         }
 
-        // Hash password
+        // If user does not exist, create new user
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
-        const verficationToken= Math.floor(100000 + Math.random() * 900000).toString()
-        const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
-        console.log("genetated otp is ",verficationToken);
+        const verificationToken = Math.floor(100000 + Math.random() * 900000).toString();
+        const verificationTokenExpiresAt = new Date(Date.now() + 1 * 60 * 1000); // OTP expiry in 5 minutes
 
         const newUser = new userModel({
             name,
             email,
             password: hashedPassword,
             isVerified: false,
-            verficationToken, // Pass OTP
-            verificationTokenExpiresAt, // Pass expiry
+            verificationToken, // OTP
+            verificationTokenExpiresAt, // Expiry
             lastLogin: new Date(),
         });
 
-        console.log("newuser data",newUser);
         await newUser.save();
+        await sendVerificationEamil(newUser.email, verificationToken);
+
+        // Generate a token and respond
         const token = createToken(newUser._id);
-        await sendVerificationEamil(newUser.email,verficationToken);
-        return res.status(200).json({success:true,message:"User Register Successfully",newUser ,token});
+        return res.status(200).json({
+            success: true,
+            message: "User registered successfully. Please verify your email.",
+            newUser,
+            token,
+        });
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: "Internal server error1" });
+        res.status(500).json({ success: false, message: "Internal server error" });
     }
 };
+
 
 // Admin Login
 const admin = async (req, res) => {
@@ -158,7 +206,7 @@ const VerfiyEmail=async(req,res)=>{
         const {otp}=req.body 
         console.log("received code from body",otp);
         const userp= await userModel.findOne({
-            verficationToken:otp,
+            verificationToken:otp,
             verificationTokenExpiresAt:{$gt:Date.now()}
         })
 
@@ -169,7 +217,7 @@ const VerfiyEmail=async(req,res)=>{
             }
           
      userp.isVerified=true;
-     userp.verficationToken=undefined;
+     userp.verificationToken=undefined;
      userp.verificationTokenExpiresAt=undefined;
      await userp.save()
      await senWelcomeEmail(userp.email,userp.name)
