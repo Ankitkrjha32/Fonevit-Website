@@ -2,6 +2,7 @@ import userModel from "../models/userModel.js";
 import validator from "validator";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import {sendVerificationEamil,senWelcomeEmail} from "../nodemailer/Email.js";
 
 
 // Create token
@@ -70,20 +71,28 @@ const registerUser = async (req, res) => {
         // Hash password
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(password, salt);
+        const verficationToken= Math.floor(100000 + Math.random() * 900000).toString()
+        const verificationTokenExpiresAt = new Date(Date.now() + 24 * 60 * 60 * 1000); // 24 hours
+        console.log("genetated otp is ",verficationToken);
 
         const newUser = new userModel({
             name,
             email,
             password: hashedPassword,
+            isVerified: false,
+            verficationToken, // Pass OTP
+            verificationTokenExpiresAt, // Pass expiry
+            lastLogin: new Date(),
         });
 
+        console.log("newuser data",newUser);
         await newUser.save();
-
         const token = createToken(newUser._id);
-        res.status(201).json({ success: true, token });
+        await sendVerificationEamil(newUser.email,verficationToken);
+        return res.status(200).json({success:true,message:"User Register Successfully",newUser ,token});
     } catch (error) {
         console.error(error);
-        res.status(500).json({ success: false, message: "Internal server error" });
+        res.status(500).json({ success: false, message: "Internal server error1" });
     }
 };
 
@@ -142,4 +151,34 @@ const getUserDetails = async (req, res) => {
     }
 };
 
-export { loginUser, registerUser, admin ,getUserDetails};
+
+// verify otp controller for email verification
+const VerfiyEmail=async(req,res)=>{
+    try {
+        const {otp}=req.body 
+        console.log("received code from body",otp);
+        const userp= await userModel.findOne({
+            verficationToken:otp,
+            verificationTokenExpiresAt:{$gt:Date.now()}
+        })
+
+        console.log("user details with code",userp);
+        if (!userp) {
+            return res.status(400).json({success:false,message:"Inavlid or Expired Code"})
+                
+            }
+          
+     userp.isVerified=true;
+     userp.verficationToken=undefined;
+     userp.verificationTokenExpiresAt=undefined;
+     await userp.save()
+     await senWelcomeEmail(userp.email,userp.name)
+     return res.status(200).json({success:true,message:"Email Verifed Successfully"})
+           
+    } catch (error) {
+        console.log(error)
+        return res.status(400).json({success:false,message:"internal server error"})
+    }
+}
+
+export { loginUser, registerUser, admin ,getUserDetails,VerfiyEmail};
