@@ -32,7 +32,13 @@ const Navbar = () => {
             
             if (response.data.success && response.data.name) {
               setUserName(response.data.name); 
-              toast.success(`Welcome! ${ response.data.name}`);
+             
+              toast.success(`Welcome! ${ response.data.name}`, {
+                autoClose: 2000, // Set time for auto-close (in ms)
+                position: "top-right", // Set the position of the toast
+                hideProgressBar: true, // Hide the progress bar
+                closeOnClick: true, // Toast closes when clicked
+              });
              
             } else {
               console.log('User not found');
