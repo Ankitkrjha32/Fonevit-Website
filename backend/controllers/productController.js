@@ -73,7 +73,7 @@ const addProduct = async (req, res) => {
             date: Date.now(),
         };
 
-        console.log(productData);
+       
 
         // Saving the product to the database
         const product = new productModel(productData);
