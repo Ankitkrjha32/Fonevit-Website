@@ -1,5 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { ShopContext } from "../context/ShopContext";
+import hide from "../assets/frontend assets/hide.png"
+import show from "../assets/frontend assets/show.png"
 import axios from "axios";
 import { toast } from "react-toastify";
 
@@ -11,6 +13,7 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [otp, setOtp] = useState(""); // OTP state
   const [demoCredentialsSet, setDemoCredentialsSet] = useState(false); 
+  const [showPassword, setShowPassword] = useState(false); // Show password state
 
   // Handle form submit for Sign Up or Login
   const handleSubmitHandler = async (e) => {
@@ -137,15 +140,28 @@ const Login = () => {
 
       {/* Password field: Hide during OTP verification */}
       {currentState !== "Verify OTP" && (
-        <input
-          onChange={(e) => setPassword(e.target.value)}
-          className="w-full px-3 py-2 border border-gray-800"
-          type="password"
-          value={password}
-          placeholder="Password"
-          required
-        />
-      )}
+    <div className="relative w-full">
+      <input
+        onChange={(e) => setPassword(e.target.value)}
+        className="w-full px-3 py-2 border border-gray-800"
+        type={showPassword ? "text" : "password"}
+        value={password}
+        placeholder="Password"
+        required
+      />
+   <button
+  type="button"
+  onClick={() => setShowPassword(!showPassword)}
+  className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-600 hover:text-gray-800"
+>
+  <img
+    src={showPassword ? show : hide}
+    alt={showPassword ? "Hide Password" : "Show Password"}
+    className="w-5 h-5"
+  />
+</button>
+    </div>
+  )}
       {currentState === "Verify OTP" && (
         <input
           onChange={(e) => setOtp(e.target.value)}

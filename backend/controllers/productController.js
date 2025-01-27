@@ -1,11 +1,46 @@
 import { v2 as cloudinary } from 'cloudinary';
 import productModel from '../models/productModel.js';
+import mongoose from 'mongoose';
+
 
 // Add product
 const addProduct = async (req, res) => {
     try {
+        // Log req.body and req.files to see what's being sent
+        console.log('req.body:', req.body);
+        console.log('req.files:', req.files);
+
         const { name, description, price, category, subCategory, sizes, bestSeller } = req.body;
 
+        // Input validation with better error messages
+        if (!name) {
+            return res.status(400).json({
+                success: false,
+                message: "Name is required.",
+            });
+        }
+        if (!category) {
+            return res.status(400).json({
+                success: false,
+                message: "Category is required.",
+            });
+        }
+        if (!price || isNaN(price)) {
+            return res.status(400).json({
+                success: false,
+                message: "Price is required and must be a valid number.",
+            });
+        }
+
+        // Parse sizes if provided
+        let parsedSizes = [];
+        if (sizes) {
+            try {
+                parsedSizes = JSON.parse(sizes);
+            } catch (err) {
+                return res.status(400).json({ success: false, message: "Sizes must be valid JSON." });
+            }
+        }
         // Extracting images from the request
         const images = [
             req.files.image1?.[0],
@@ -44,7 +79,7 @@ const addProduct = async (req, res) => {
         const product = new productModel(productData);
         await product.save();
 
-        res.status(200).json({ success: true, message: "Product added successfully" });
+        res.status(200).json({ success: true, message: "Product added successfully" ,productData});
     } catch (error) {
         console.error(error);
         res.status(500).json({ success: false, message: error.message });
@@ -63,16 +98,31 @@ const listProducts = async (req, res) => {
 };
 
 // Remove a product
+
+
 const removeProduct = async (req, res) => {
-    try {
-        const { id } = req.body;
-        await productModel.findByIdAndDelete(id);
-        res.json({ success: true, message: "Product removed successfully" });
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ success: false, message: error.message });
+  try {
+    const { id } = req.body;
+    console.log(id);
+
+    // Validate the ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({ success: false, message: "Invalid product ID" });
     }
+
+    const product = await productModel.findByIdAndDelete(id);
+
+    if (!product) {
+      return res.status(404).json({ success: false, message: "Product not found" });
+    }
+
+    res.json({ success: true, message: "Product removed successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ success: false, message: error.message });
+  }
 };
+
 
 // Get a single product
 const singleProduct = async (req, res) => {

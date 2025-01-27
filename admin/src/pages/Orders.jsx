@@ -16,11 +16,11 @@ const Orders = ({ token }) => {
       return null;
     }
     try {
-      const response = await axios.post(
-        backendUrl + "/api/order/list",
-        {},
-        { headers: { token } }
-      );
+      const response = await axios.post(backendUrl + '/api/order/list', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
       if (response.data.success) {
        
         setOrders(response.data.orders);
@@ -36,7 +36,10 @@ const Orders = ({ token }) => {
 
   const statusHandler = async (event, orderId) => {
     try {
-      const response = await axios.post(backendUrl + '/api/order/status',{orderId, status: event.target.value},{headers: {token}})
+      const response = await axios.post(backendUrl + '/api/order/status',{orderId, status: event.target.value},{headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    });
       if(response.data.success){
         await fetchAllOrders();
       }

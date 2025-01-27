@@ -5,10 +5,14 @@ import CartTotal from "../components/CartTotal";
 import { ShopContext } from "../context/ShopContext";
 import axios from "axios";
 import { toast } from "react-toastify";
+import { jwtDecode } from 'jwt-decode';
+
+
 
 const PlaceOrder = () => {
+
   const [method, setMethod] = useState("cod");
-  const { navigate,backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
+  const { navigate, backendUrl, token, cartItems, setCartItems, getCartAmount, delivery_fee, products } = useContext(ShopContext);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -20,8 +24,19 @@ const PlaceOrder = () => {
     country: "",
     phone: "",
   });
+
+
  
-  
+  const userId =jwtDecode(token).id; // Decode the token and get userId
+
+  if (!userId) {
+    console.error("User ID not found in the token.");
+    return;
+  }
+
+
+
+
   const onChangeHandler = (e) => {
     const name = e.target.name;
     const value = e.target.value;
@@ -32,54 +47,72 @@ const PlaceOrder = () => {
   const onSubmitHandler = async (e) => {
     e.preventDefault();
 
-try {
-  let orderItems = [];
+    try {
+      let orderItems = [];
 
-  for(const items in cartItems){
-    for(const itemSize in cartItems[items]){
-      if(cartItems[items][itemSize]){
-        const itemInfo = structuredClone(products.find(product => product._id === items))
-        if(itemInfo){
-          itemInfo.size = itemSize;
-          itemInfo.quantity = cartItems[items][itemSize];
-          orderItems.push(itemInfo);
+      for (const items in cartItems) {
+        for (const itemSize in cartItems[items]) {
+          if (cartItems[items][itemSize]) {
+            const itemInfo = structuredClone(products.find(product => product._id === items))
+            if (itemInfo) {
+              itemInfo.size = itemSize;
+              itemInfo.quantity = cartItems[items][itemSize];
+              orderItems.push(itemInfo);
+            }
+          }
         }
       }
-    }
-  }
-  console.log(orderItems);
-  let orderData = {
-    address: formData,
-    items: orderItems,
-    amount: getCartAmount() + delivery_fee,
 
-  }
-  switch(method){
-    case 'cod':
-      const response = await axios.post(backendUrl + '/api/order/place',orderData,{headers: {token}});
-      if(response.data.success){
-        setCartItems({});
-        navigate('/orders');
-      }else{
-        console.log("Something went wrong");
-      } 
-    break;
-    case 'stripe':
-      const responseStripe = await axios.post(backendUrl + '/api/order/stripe',orderData,{headers: {token}});
-      if(responseStripe.data.success){
-        setCartItems({});
-        const {session_url} = responseStripe.data;
-        window.location.replace(session_url);
-      }else{
-        toast.error(response.data.message);
+  
+      
+     
+      let orderData = {
+        userId,
+        address: formData,
+        items: orderItems,
+        amount: getCartAmount() + delivery_fee,
+
       }
-      break;
-    default:
-  }
+     
+      console.log("orderData from pages place on fronted", orderData);
 
-} catch (error) {
-  console.log(error);
-}
+      switch (method) {
+        case 'cod':
+          console.log("token from code in place fronted", token);
+          const response = await axios.post(backendUrl + '/api/order/place',orderData,  { headers: { Authorization: `Bearer ${token}` } });
+
+          console.log("fetching res from backend /order place", response);
+
+          if (response.data.success) {
+            setCartItems({});
+            toast.success(response.data.message);
+            navigate('/orders');
+          } else {
+            console.log("Something went wrong");
+          }
+          break;
+        case 'stripe':
+          const responseStripe = await axios.post(backendUrl + '/api/order/stripe', {
+            orderData
+          }, {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          });
+          if (responseStripe.data.success) {
+            setCartItems({});
+            const { session_url } = responseStripe.data;
+            window.location.replace(session_url);
+          } else {
+            toast.error(response.data.message);
+          }
+          break;
+        default:
+      }
+
+    } catch (error) {
+      console.log(error);
+    }
   }
 
   return (
@@ -196,9 +229,8 @@ try {
             className="flex items-center gap-3 border py-2 px-3 cursor-pointer"
           >
             <p
-              className={`min-w-3.5 h-3.5 border rounded-full ${
-                method === "stripe" ? "bg-green-500" : ""
-              }`}
+              className={`min-w-3.5 h-3.5 border rounded-full ${method === "stripe" ? "bg-green-500" : ""
+                }`}
             ></p>
             <img className="h-5 mx-auto" src={assets.stripe_logo} alt="" />
           </div>
@@ -208,9 +240,8 @@ try {
             className="flex items-center gap-3 border py-2 px-3 cursor-pointer"
           >
             <p
-              className={`min-w-3.5 h-3.5 border rounded-full ${
-                method === "razorpay" ? "bg-green-500" : ""
-              }`}
+              className={`min-w-3.5 h-3.5 border rounded-full ${method === "razorpay" ? "bg-green-500" : ""
+                }`}
             ></p>
             <img className="h-5 mx-auto" src={assets.razorpay_logo} alt="" />
           </div>
@@ -220,9 +251,8 @@ try {
             className="flex items-center gap-3 border py-2 px-3 cursor-pointer"
           >
             <p
-              className={`min-w-3.5 h-3.5 border rounded-full ${
-                method === "cod" ? "bg-green-500" : ""
-              }`}
+              className={`min-w-3.5 h-3.5 border rounded-full ${method === "cod" ? "bg-green-500" : ""
+                }`}
             ></p>
             <p className="text-gray-500 text-sm font-medium mx-4">
               Cash on Delivery
@@ -232,13 +262,14 @@ try {
 
         <div className="w-full text-end mt-5">
           <button
-          type="submit"
-            onClick={() => navigate("/orders")}
+            type="submit"
+            // onClick={() => navigate("/orders")}
             className="bg-black text-gray-100 px-16 py-3 text-sm"
           >
             PLACE ORDER
           </button>
         </div>
+
       </div>
     </form>
   );

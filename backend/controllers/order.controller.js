@@ -10,7 +10,10 @@ const delivery_charge = 10;
 // Placing orders using COD method
 const placeOrder = async (req,res) => {
     try {
-        const {userId,items,address,amount} = req.body;
+        const {items,address,amount} = req.body;
+        const {userId} = req.body;
+
+        console.log('User Info from Middleware:', req.user);
 
         const orderData = {
             userId,
@@ -21,6 +24,9 @@ const placeOrder = async (req,res) => {
             payment: false,
             date: Date.now()
         }
+
+        console.log("order data from order conteoller",orderData);
+
         const newOrder = new orderModel(orderData);
         await newOrder.save();
 
@@ -89,23 +95,23 @@ const placeOrder = async (req,res) => {
 // }
 
 // //verify stripe
-//   const verifyPayment = async (req,res) => {
-//     try {
-//         const {userId, orderId, success} = req.body;
-//         if(success === "true"){
-//             await orderModel.findByIdAndUpdate(orderId, {payment: true});
-//             await userModel.findByIdAndUpdate(userId, {cartData : {}});
-//             res.json({success: true})
-//         }else{
-//             await orderModel.findByIdAndDelete(orderId);
-//             res.json({success: false});
-//         }
-//     } catch (error) {
+  const verifyPayment = async (req,res) => {
+    try {
+        const {userId, orderId, success} = req.body;
+        if(success === "true"){
+            await orderModel.findByIdAndUpdate(orderId, {payment: true});
+            await userModel.findByIdAndUpdate(userId, {cartData : {}});
+            res.json({success: true})
+        }else{
+            await orderModel.findByIdAndDelete(orderId);
+            res.json({success: false});
+        }
+    } catch (error) {
 
-//         console.log(error)
-//         res.json({success: true, message: error.message});
-//     }
-// }
+        console.log(error)
+        res.json({success: true, message: error.message});
+    }
+}
 
 //Placing orders using Razorpay method
 const placeOrderRazorpay = async (req,res) => {
@@ -175,5 +181,5 @@ const updateStatus = async (req,res)=> {
     }
 }
 
-export  {placeOrder,placeOrderRazorpay,allOrders,userOrders,updateStatus};
+export  {placeOrder,placeOrderRazorpay,allOrders,userOrders,updateStatus,verifyPayment};
 // export  {placeOrder,placeOrderStripe,placeOrderRazorpay,allOrders,userOrders,updateStatus,verifyPayment};

@@ -20,10 +20,7 @@ app.use(express.json());
 // Middleware to parse URL-encoded data (if needed)
 app.use(express.urlencoded({ extended: true }));
 
-app.use(cors({
-    origin: '*',
-    credentials: true,
-}));
+app.use(cors());
 
 // api endpoints
 app.use('/api/user',userRouter);
