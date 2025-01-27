@@ -1,12 +1,18 @@
-
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-
-// https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
   server: {
-    port: process.env.PORT || 5174, // Use the `PORT` environment variable if available
-    host: '0.0.0.0', // Ensure the app is accessible on all network interfaces
+    host: '0.0.0.0', // Allows external access
+    port: process.env.PORT || 3000, // Use Render's dynamically assigned port
+    allowedHosts: [
+      'fonevit-website-frontend.onrender.com', // First frontend server
+      'fonevit-website-adminpanel-fronted.onrender.com', // Second frontend server
+    ],
+    hmr: {
+      host: process.env.RENDER_EXTERNAL_HOSTNAME || 'localhost', // Dynamic hostname for HMR
+      protocol: 'wss', // Use WebSocket Secure for HTTPS
+    },
+  },
+  build: {
+    outDir: 'dist', // Output directory
   },
 })
