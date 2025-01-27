@@ -90,6 +90,7 @@ const addProduct = async (req, res) => {
 const listProducts = async (req, res) => {
     try {
         const products = await productModel.find({});
+        console.log("product in product controoler", products);
         res.json({ success: true, products });
     } catch (error) {
         console.error(error);
@@ -127,8 +128,10 @@ const removeProduct = async (req, res) => {
 // Get a single product
 const singleProduct = async (req, res) => {
     try {
+        console.log("hitting single product controller in backend");
         const { productId } = req.body;
         const product = await productModel.findById(productId);
+        console.log("product in single product hitting single product controller in backend", product);
         if (!product) {
             return res.status(404).json({ success: false, message: "Product not found" });
         }

@@ -191,7 +191,7 @@
 
 import { createContext, useEffect, useState } from "react";
 import { toast } from "react-toastify";
-import { products as p1 } from "../assets/frontend assets/assets";
+// import { products } from "../assets/frontend assets/assets";
 import { useNavigate } from "react-router-dom";
 import axios from 'axios';
 import { jwtDecode } from 'jwt-decode';
@@ -227,6 +227,12 @@ const ShopContextProvider = (props) => {
       cartData[itemId] = {};
       cartData[itemId][itemSize] = 1;
     }
+     toast.success("item Added to Cart", {
+            autoClose: 2000, // Set time for auto-close (in ms)
+            position: "top-right", // Set the position of the toast
+            hideProgressBar: true, // Hide the progress bar
+            closeOnClick: true, // Toast closes when clicked
+          });
     setCartItems(cartData);
     // navigate('/cart');
     
@@ -292,9 +298,9 @@ const ShopContextProvider = (props) => {
 
     try {
       const userId = jwtDecode(token).id;
-      console.log("user id in getcart fxn in shopcontext ", userId);
+      // console.log("user id in getcart fxn in shopcontext ", userId);
       const response = await axios.post(backendUrl + '/api/cart/get', { userId }, { headers: { Authorization: `Bearer ${token}` } });
-      console.log("respon for getcart after hitting backend in shopcontext", response);
+      // console.log("respon for getcart after hitting backend in shopcontext", response);
       if (response.data.success) {
         setCartItems(response.data.cartData);
       } else {
@@ -309,6 +315,7 @@ const ShopContextProvider = (props) => {
   const fetchProducts = async () => {
     try {
       const response = await axios.get(backendUrl + '/api/product/list');
+      console.log("fetched produuct from shopcontect", response.data.products); 
       if (response.data.success) {
         setProducts(response.data.products);
       } else {
@@ -346,6 +353,7 @@ const ShopContextProvider = (props) => {
     navigate,
     backendUrl,
     products,
+    setProducts,
     token,
     setToken,
   };
