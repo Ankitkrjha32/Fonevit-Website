@@ -13,7 +13,7 @@ const placeOrder = async (req,res) => {
         const {items,address,amount} = req.body;
         const {userId} = req.body;
 
-        console.log('User Info from Middleware:', req.user);
+        console.log('User Info from Middleware d:', req.user);
 
         const orderData = {
             userId,
