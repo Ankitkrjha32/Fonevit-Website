@@ -1,7 +1,7 @@
 eCommerce Website Project using MERN Stack
 This tutorial will guide you through building and deploying a full-stack eCommerce website using the MERN Stack (MongoDB, Express.js, React.js, and Node.js), with deployment on Vercel. The website allows users to browse products, filter and sort them, add items to the cart, and place orders. The project integrates Stripe and Razorpay for online payments and features an admin dashboard for managing products, users, and orders.
 
-Key Features:
+Key Features includes:
 User Features:
 Browse, filter, and sort products
 Add products to the cart with variants (size)
